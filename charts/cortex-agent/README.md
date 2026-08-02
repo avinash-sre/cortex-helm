@@ -16,8 +16,9 @@
 | 1.7.0         | >=7.5         | Bottlerocket support
 | 1.8.0         | >=7.5         | SELinux spc_t (Super Privileged Container) support
 | 1.9.0         | >=7.5         | Support external deployment secret
-| 1.10.0        | >=7.5         | `daemonset.resources` split into `full`/`sensor` profiles, automatically selected by `agent.sensorMode`
+| 1.10.0        | >=7.5         | `daemonset.resources` split into `full`/`sensor` profiles, automatically selected by `agent.agentFlavor`
 | 1.11.0        | >=7.5         | Support for Flatcar Container Linux platform
+| 1.11.0        | >=7.5         | `agent.agentFlavor` added (1 = `standard`, 3 = `cloud/sensor`).
 
 ## Installing Cortex XDR helm chart
 
@@ -101,14 +102,15 @@ Even when using `--reuse-values` (which uses the values of the previous installa
 | `platform.gcos`                        | Support for GCOS (Google Container-Optimized OS) platform (Required when installing on GCOS)               | Since 1.5.0, agent >= 8.2
 | `platform.bottlerocket`                | Support for BottlerocketOS platform (Required when installing on BottlerocketOS)                           | Since 1.6.3, agent >= 8.3
 | `platform.autopilot`                   | Support for Autopilot platform (Required when installing on GKE Autopilot cluster)                         | Since 1.8.0, agent >= 8.9
-| `platform.flatcar`                     | Support for Flatcar Container Linux (Required when installing on Flatcar; use with `agent.sensorMode`)     | Since 1.11.0, agent >= 9.3
+| `platform.flatcar`                     | Support for Flatcar Container Linux (Required when installing on Flatcar; use with `agent.agentFlavor: 3`)     | Since 1.11.0, agent >= 9.3
 | `agent.clusterName`                    | Name of the kuberenets cluster, will be used as part of the information sent to the server                 | Since 1.5.0, agent >= 8.2
 | `namespace.name`                       | Name of the namespace the agent resides on                                                                 | Since 1.6.0
 | `namespace.create`                     | Create/Don't create namespace for the agent                                                                | Since 1.6.0
 | `daemonset.selinuxOptionsSpcT`         | Set SELinux Options type to 'spc_t'                                                                        | Since 1.8.0
-| `agent.sensorMode`                     | Enable sensor mode for lightweight cloud-native deployments. Also selects `daemonset.resources.sensor` over `daemonset.resources.full` | Since 1.10.0, agent >= 9.3
-| `daemonset.resources.full`             | Resource requests/limits used when `agent.sensorMode` is `false` (default)                                 | Since 1.10.0
-| `daemonset.resources.sensor`           | Resource requests/limits used when `agent.sensorMode` is `true`                                            | Since 1.10.0
+| `agent.sensorMode`                     | **Removed in 1.11.0 — use `agent.agentFlavor: 3` instead.** Enable sensor mode for lightweight cloud-native deployments. Also selects `daemonset.resources.sensor` over `daemonset.resources.full` | Since 1.10.0, agent >= 9.3
+| `daemonset.resources.full`             | Resource requests/limits used when `agent.agentFlavor` is `1` (default)                                 | Since 1.10.0
+| `daemonset.resources.sensor`           | Resource requests/limits used when `agent.agentFlavor` is `3`                                            | Since 1.10.0
+| `agent.agentFlavor`                    | Agent flavor: `1` = standard (default), `3` = cloud/sensor. Flavor `3` also selects `daemonset.resources.sensor` | Since 1.11.0, agent >= 9.4
 
 Note: Helm requires commas in arguments to be escaped.
 
@@ -128,10 +130,10 @@ is now nested under a profile name:
 ```yaml
 daemonset:
   resources:
-    full:    # used when agent.sensorMode == false
+    full:    # used when agent.agentFlavor == 1 (default)
       limits:    { memory: "2Gi", ephemeral-storage: "10Gi" }
       requests:  { cpu: "200m", memory: "600Mi", ephemeral-storage: "5Gi" }
-    sensor:  # used when agent.sensorMode == true
+    sensor:  # used when agent.agentFlavor == 3
       limits:    { cpu: "1000m", memory: "350Mi", ephemeral-storage: "10Gi" }
       requests:  { cpu: "200m",  memory: "256Mi", ephemeral-storage: "5Gi" }
 ```

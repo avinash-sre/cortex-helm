@@ -115,9 +115,10 @@ spec:
         - name: XDR_CLUSTER_TYPE
           value: "autopilot"
         {{- end }}
-        {{- if .Values.agent.sensorMode }}
-        - name: XDR_SENSOR_MODE
-          value: "1"
+        {{- $agentFlavor := include "cortex-xdr.agentFlavor" . }}
+        {{- if ne $agentFlavor "1" }}
+        - name: XDR_AGENT_FLAVOR
+          value: {{ $agentFlavor | quote }}
         {{- end }}
 
         volumeMounts:

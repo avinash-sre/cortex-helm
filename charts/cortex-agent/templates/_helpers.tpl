@@ -109,12 +109,32 @@ Specify the SELinux context options type
 {{- end -}}
 
 {{/*
-Select the daemonset resources block based on agent.sensorMode.
-  sensorMode: false -> .Values.daemonset.resources.full
-  sensorMode: true  -> .Values.daemonset.resources.sensor
+Effective agent flavor: 1 (standard) or 3 (cloud/sensor).
+*/}}
+{{- define "cortex-xdr.agentFlavor" -}}
+{{- if hasKey .Values.agent "sensorMode" -}}
+{{- fail "agent.sensorMode was removed in chart 1.11.0 - use agent.agentFlavor: 3 instead." -}}
+{{- end -}}
+{{- $raw := .Values.agent.agentFlavor -}}
+{{- if kindIs "invalid" $raw -}}
+{{- $raw = 1 -}}
+{{- end -}}
+{{- $agentFlavor := int $raw -}}
+{{- if eq $agentFlavor 2 -}}
+{{- fail "agent.agentFlavor=2 (nano) is not supported." -}}
+{{- else if not (has $agentFlavor (list 1 3)) -}}
+{{- fail (printf "agent.agentFlavor must be 1 (standard) or 3 (cloud/sensor), got '%v'" $raw) -}}
+{{- end -}}
+{{- $agentFlavor -}}
+{{- end -}}
+
+{{/*
+Select the daemonset resources block based on agent.agentFlavor.
+  agentFlavor: 3 -> .Values.daemonset.resources.sensor
+  otherwise      -> .Values.daemonset.resources.full
 */}}
 {{- define "cortex-xdr.daemonsetResources" -}}
-{{- if .Values.agent.sensorMode -}}
+{{- if eq (include "cortex-xdr.agentFlavor" .) "3" -}}
 {{- toYaml .Values.daemonset.resources.sensor -}}
 {{- else -}}
 {{- toYaml .Values.daemonset.resources.full -}}
