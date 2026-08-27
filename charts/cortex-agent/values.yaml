@@ -40,7 +40,7 @@ platform:
   # Deploy on autopilot cluster
   autopilot: false
   # Deploy on Flatcar (immutable rootfs; /lib/modules is read-only).
-  # Enable together with agent.sensorMode: true.
+  # Enable together with agent.agentFlavor: 3.
   flatcar: false
 
 rbac:
@@ -64,8 +64,10 @@ agent:
   # Name of the kuberenetes cluster - optional
   clusterName: ""
 
-  # Enable sensor mode for lightweight cloud-native deployments
-  sensorMode: false
+  # Agent flavor selects the feature-set for the deployment:
+  #   1 = standard (default, full agent)
+  #   3 = cloud/sensor mode (lightweight, selects the sensor resource profile)
+  agentFlavor: 1
 
 daemonset:
   # node labels to match pods with
@@ -107,9 +109,9 @@ daemonset:
     url: ""
 
   # Resource profiles for the cortex agent container.
-  # The profile used at runtime is selected by `agent.sensorMode`:
-  #   sensorMode: false -> resources.full   (default, full agent)
-  #   sensorMode: true  -> resources.sensor (lightweight cloud-native)
+  # The profile used at runtime is selected by `agent.agentFlavor`:
+  #   agentFlavor: 1 -> resources.full   (default, full agent)
+  #   agentFlavor: 3 -> resources.sensor (lightweight cloud-native)
   # These values are the recommended values for cortex agent
   # and are not recommended to change!
   resources:
