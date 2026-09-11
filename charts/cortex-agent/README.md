@@ -19,6 +19,7 @@
 | 1.10.0        | >=7.5         | `daemonset.resources` split into `full`/`sensor` profiles, automatically selected by `agent.agentFlavor`
 | 1.11.0        | >=7.5         | Support for Flatcar Container Linux platform
 | 1.11.0        | >=7.5         | `agent.agentFlavor` added (1 = `standard`, 3 = `cloud/sensor`).
+| 1.12.0        | >=7.5         | `daemonset.podLabels` support; `daemonset.podAnnotations` now renders correctly on all Kubernetes versions
 
 ## Installing Cortex XDR helm chart
 
@@ -106,6 +107,8 @@ Even when using `--reuse-values` (which uses the values of the previous installa
 | `agent.clusterName`                    | Name of the kuberenets cluster, will be used as part of the information sent to the server                 | Since 1.5.0, agent >= 8.2
 | `namespace.name`                       | Name of the namespace the agent resides on                                                                 | Since 1.6.0
 | `namespace.create`                     | Create/Don't create namespace for the agent                                                                | Since 1.6.0
+| `daemonset.podLabels`                  | Extra labels to add to each DaemonSet pod, merged with the chart's standard labels                        | Since 1.12.0
+| `daemonset.podAnnotations`             | Annotations for DaemonSet pods. On K8s >= 1.30, the default AppArmor annotation is omitted (handled natively); custom annotations are always rendered | Since 1.12.0
 | `daemonset.selinuxOptionsSpcT`         | Set SELinux Options type to 'spc_t'                                                                        | Since 1.8.0
 | `agent.sensorMode`                     | **Removed in 1.11.0 — use `agent.agentFlavor: 3` instead.** Enable sensor mode for lightweight cloud-native deployments. Also selects `daemonset.resources.sensor` over `daemonset.resources.full` | Since 1.10.0, agent >= 9.3
 | `daemonset.resources.full`             | Resource requests/limits used when `agent.agentFlavor` is `1` (default)                                 | Since 1.10.0

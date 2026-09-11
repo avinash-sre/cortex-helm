@@ -13,11 +13,19 @@ spec:
 
   template:
     metadata:
-      labels: {{- include "cortex-xdr.labels" . | nindent 8 }}
-
+      labels:
+        {{- include "cortex-xdr.labels" . | nindent 8 }}
+        {{- with .Values.daemonset.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       {{- if semverCompare "<1.30-0" .Capabilities.KubeVersion.Version }}
       annotations:
-        {{ toYaml .Values.daemonset.podAnnotations }}
+        {{- toYaml .Values.daemonset.podAnnotations | nindent 8 }}
+      {{- else }}
+      {{- with (omit .Values.daemonset.podAnnotations "container.apparmor.security.beta.kubernetes.io/cortex-agent") }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- end }}
 
     spec:
