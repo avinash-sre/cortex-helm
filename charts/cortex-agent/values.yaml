@@ -74,6 +74,15 @@ daemonset:
   nodeSelector:
     kubernetes.io/os: linux
 
+  # Extra labels to add to each DaemonSet pod (merged with the chart's standard labels).
+  # Useful for policy engines (e.g. Kyverno, OPA/Gatekeeper) that require specific labels.
+  podLabels: {}
+
+  # Annotations to add to each DaemonSet pod.
+  # On Kubernetes < 1.30 all entries are rendered (including the AppArmor annotation).
+  # On Kubernetes >= 1.30 the AppArmor annotation is omitted (the chart uses the native
+  # securityContext.appArmorProfile field instead); any other annotations you add here
+  # are still rendered.
   podAnnotations:
     container.apparmor.security.beta.kubernetes.io/cortex-agent: unconfined
 
